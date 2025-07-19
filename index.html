@@ -1,0 +1,251 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Vela decorativa flor de cubo mediano</title>
+  <style>
+    body {
+      font-family: 'Segoe UI', sans-serif;
+      background: #fff8f0;
+      padding: 20px;
+    }
+
+    .container {
+      max-width: 500px;
+      margin: auto;
+      background: white;
+      padding: 30px;
+      border-radius: 12px;
+      box-shadow: 0 0 15px rgba(0,0,0,0.1);
+    }
+
+    h2 {
+      text-align: center;
+      color: #333;
+      margin-bottom: 20px;
+    }
+
+    label {
+      display: block;
+      margin-top: 15px;
+      font-weight: bold;
+    }
+
+    input[type="text"], input[type="number"], select {
+      width: 100%;
+      padding: 10px;
+      border-radius: 8px;
+      border: 1px solid #ccc;
+      margin-top: 5px;
+      font-size: 1rem;
+    }
+
+    .color-options {
+      display: flex;
+      margin-top: 10px;
+      gap: 10px;
+    }
+
+    .color-circle {
+      width: 30px;
+      height: 30px;
+      border-radius: 50%;
+      cursor: pointer;
+      border: 2px solid transparent;
+      box-shadow: 0 0 3px rgba(0,0,0,0.3);
+    }
+
+    .color-circle.selected {
+      border: 2px solid #000;
+    }
+
+    .submit-button {
+      width: 100%;
+      margin-top: 25px;
+      padding: 12px;
+      background-color: #222;
+      color: white;
+      font-size: 1rem;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+
+    .submit-button:hover {
+      background-color: #444;
+    }
+
+    #precio {
+      margin-top: 25px;
+      font-size: 1.2rem;
+      font-weight: bold;
+      text-align: center;
+      color: #000;
+    }
+  </style>
+</head>
+<body>
+  <div class="container">
+    <h2>Personaliza tu vela</h2>
+    <form id="velaForm">
+      <label>Producto:</label>
+      <input type="text" id="producto" value="Vela decorativa flor de cubo mediano" readonly />
+
+      <label>Aroma:</label>
+      <select id="aroma" onchange="actualizarPrecio()">
+        <option value="Sin aroma" selected>Sin aroma</option>
+        <option value="Vainilla">Vainilla</option>
+        <option value="Rosa">Rosa</option>
+        <option value="Arbol">Árbol de té</option>
+        <option value="Menta">Menta</option>
+        <option value="Naranja">Naranja dulce</option>
+        <option value="Limón">Limón</option>
+        <option value="Eucalipto">Eucalipto</option>
+        <option value="Romero">Romero</option>
+        <option value="Incienso">Incienso</option>
+        <option value="Lima">Naranja-lima</option>
+        <option value="Tropical">Aroma Tropical</option>
+        <option value="Canela">Canela</option>
+        <option value="Hierba de limón">Hierba de limón</option>
+      </select>
+
+      <label>Color:</label>
+      <div class="color-options" id="colorOptions">
+        <div class="color-circle" style="background-color: #90EE90;" data-color="Verde claro"></div>
+        <div class="color-circle" style="background-color: #f66b92;" data-color="Rosado suave"></div>
+        <div class="color-circle" style="background-color: #ff3855;" data-color="Rojo neón"></div>
+        <div class="color-circle" style="background-color: #3f00ff;" data-color="Azul Ultramarino"></div>
+        <div class="color-circle" style="background-color: #fe59c2;" data-color="Fucsia"></div>
+        <div class="color-circle" style="background-color: #ffa500;" data-color="Naranja"></div>
+        <div class="color-circle" style="background-color: #bf00ff;" data-color="Púrpura"></div>
+        <div class="color-circle" style="background-color: #ffd67b;" data-color="Amarillo pastel"></div>
+        <div class="color-circle" style="background-color: #a3989d;" data-color="Lila grisáceo"></div>
+        <div class="color-circle" style="background-color: red;" data-color="Rojo"></div>
+      </div>
+      <input type="hidden" id="color" />
+
+      <label>¿Deseas empaque especial de regalo?</label>
+      <select id="empaqueRegalo" onchange="actualizarPrecio()">
+        <option value="estandar" selected>No, gracias (bolsita estándar)</option>
+        <option value="Caja plateada">Caja plateada (+280 CUP)</option>
+      </select>
+
+      <label>Cantidad (1–10):</label>
+      <div style="display: flex; align-items: center; gap: 10px;">
+        <button type="button" onclick="cambiarCantidad(-1)" style="padding: 5px 10px;">−</button>
+        <input type="number" id="cantidad" min="1" max="10" value="1" style="text-align: center; width: 60px;" />
+        <button type="button" onclick="cambiarCantidad(1)" style="padding: 5px 10px;">+</button>
+      </div>
+
+      <label>Tu nombre:</label>
+      <input type="text" id="nombre" />
+
+      <div id="precioUnidad">Precio por unidad: 1,500 CUP</div>
+      <div id="precioTotal">Precio total: 1,500 CUP</div>
+      
+      <button type="button" class="submit-button" onclick="enviarWhatsapp()">Enviar por WhatsApp</button>
+    </form>
+  </div>
+
+  <script>
+    var colorCircles = document.querySelectorAll('.color-circle');
+    var colorInput = document.getElementById('color');
+    var aromaSelect = document.getElementById('aroma');
+    var precioDiv = document.getElementById('precio');
+    var empaqueSelect = document.getElementById('empaqueRegalo');
+
+    const precioSinAroma = 500;
+    const precioConAroma = 750;
+    const precioPlateada = 280;
+
+    colorCircles.forEach(function(circle) {
+      circle.addEventListener('click', function() {
+        colorCircles.forEach(c => c.classList.remove('selected'));
+        circle.classList.add('selected');
+        colorInput.value = circle.getAttribute('data-color');
+      });
+    });
+
+    function actualizarPrecio() {
+      const aroma = aromaSelect.value;
+      const empaque = empaqueSelect.value;
+      const cantidad = parseInt(document.getElementById('cantidad').value || 1, 10);
+    
+      // Precio base solo según aroma (sin incluir empaque)
+      let precioUnidad = aroma === "Sin aroma" ? precioSinAroma : precioConAroma;
+    
+      // Precio extra por empaque
+      let extraEmpaque = 0;
+      if (empaque === "Caja plateada") extraEmpaque = precioPlateada;
+    
+      // Total = (precio unidad × cantidad) + precio empaque
+      const total = (precioUnidad * cantidad) + extraEmpaque;
+    
+      document.getElementById("precioUnidad").textContent = "💰 Precio por unidad: " + precioUnidad + " CUP";
+      document.getElementById("precioTotal").textContent = "💵 Precio total: " + total + " CUP";
+    }
+    
+    function cambiarCantidad(delta) {
+      var input = document.getElementById('cantidad');
+      var value = parseInt(input.value || 1, 10);
+      var min = parseInt(input.min, 10);
+      var max = parseInt(input.max, 10);
+    
+      var nuevoValor = value + delta;
+      if (nuevoValor >= min && nuevoValor <= max) {
+        input.value = nuevoValor;
+        actualizarPrecio();
+      }
+    }
+
+
+    function enviarWhatsapp() {
+        var producto = document.getElementById('producto').value.trim();
+        var aroma = aromaSelect.value.trim();
+        var color = document.getElementById('color').value.trim();
+        var cantidad = parseInt(document.getElementById('cantidad').value.trim(), 10);
+        var nombre = document.getElementById('nombre').value.trim();
+        var empaque = empaqueSelect.value.trim();
+      
+        if (!color) {
+          alert("Selecciona un color.");
+          return;
+        }
+        if (!cantidad || cantidad < 1 || cantidad > 10) {
+          alert("Ingresa una cantidad válida.");
+          return;
+        }
+        if (!nombre) {
+          alert("Ingresa tu nombre.");
+          return;
+        }
+      
+        // Solo el precio de la vela (con o sin aroma)
+        var precioUnidad = aroma === "Sin aroma" ? precioSinAroma : precioConAroma;
+      
+        // Suma del empaque
+        var extraEmpaque = 0;
+        if (empaque === "Caja plateada") extraEmpaque = precioPlateada;
+      
+        // Total final
+        var precioTotal = (precioUnidad * cantidad) + extraEmpaque;
+      
+        var mensaje = "Hola, quiero hacer un pedido de velas:\n\n"
+          + "🕯️ Producto: " + producto + "\n"
+          + "🌸 Aroma: " + aroma + "\n"
+          + "🎨 Color: " + color + "\n"
+          + "🎁 Empaque: " + empaque + "\n"
+          + "🔢 Cantidad: " + cantidad + "\n"
+          + "👤 Nombre: " + nombre + "\n"
+          + "💰 Precio por unidad: " + precioUnidad + " CUP"
+          + "\n💵 Precio total: " + precioTotal + " CUP";
+      
+        var url = "https://wa.me/5353810462?text=" + encodeURIComponent(mensaje);
+        window.open(url, "_blank");
+      }
+
+    window.onload = actualizarPrecio;
+  </script>
+</body>
+</html>
